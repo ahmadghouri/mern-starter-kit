@@ -20,6 +20,13 @@ async function findUserOrFail(userId, { withPassword = false } = {}) {
 
 /** Sensitive changes require the current password, even with a valid session. */
 async function verifyCurrentPassword(user, currentPassword) {
+  if (!user.passwordHash) {
+    throw badRequest(
+      'NO_PASSWORD_SET',
+      'Your account uses Google sign-in and has no password yet. Use "Forgot password" on the sign-in page to set one.',
+    );
+  }
+
   const matches = await bcrypt.compare(currentPassword, user.passwordHash);
   if (!matches) {
     throw badRequest('INVALID_CURRENT_PASSWORD', 'Current password is incorrect', [
@@ -71,6 +78,24 @@ async function changePassword(userId, sessionId, { currentPassword, newPassword 
   await sessionService.revokeOtherUserSessions(user._id, sessionId, 'password_changed');
 }
 
+/** Disconnects Google. Requires a password so the user cannot lock themselves out. */
+async function disconnectGoogle(userId) {
+  const user = await findUserOrFail(userId, { withPassword: true });
+  if (!user.googleId) {
+    return toPublicUser(user);
+  }
+  if (!user.passwordHash) {
+    throw badRequest(
+      'NO_PASSWORD_SET',
+      'Set a password first (use "Forgot password" on the sign-in page), then disconnect Google.',
+    );
+  }
+
+  user.googleId = undefined;
+  await user.save();
+  return toPublicUser(user);
+}
+
 async function setAvatar(userId, data) {
   const contentType = detectImageType(data);
   if (!contentType) {
@@ -110,6 +135,7 @@ module.exports = {
   updateProfile,
   changeEmail,
   changePassword,
+  disconnectGoogle,
   setAvatar,
   removeAvatar,
   getAvatar,

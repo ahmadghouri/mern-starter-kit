@@ -142,6 +142,18 @@ async function revokeOtherUserSessions(userId, keepSessionId, reason) {
   );
 }
 
+/** Returns the active session for a refresh token without rotating it, or null. */
+async function findActiveSessionByToken(refreshToken) {
+  if (!refreshToken) {
+    return null;
+  }
+  return Session.findOne({
+    tokenHash: hashToken(refreshToken),
+    revokedAt: null,
+    expiresAt: { $gt: new Date() },
+  });
+}
+
 async function isSessionActive({ sessionId, userId }) {
   const session = await Session.exists({
     _id: sessionId,
@@ -167,6 +179,7 @@ module.exports = {
   revokeUserSession,
   revokeAllUserSessions,
   revokeOtherUserSessions,
+  findActiveSessionByToken,
   isSessionActive,
   listActiveUserSessions,
 };

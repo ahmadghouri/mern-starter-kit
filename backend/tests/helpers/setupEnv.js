@@ -15,4 +15,7 @@ Object.assign(process.env, {
   RATE_LIMIT_API_MAX: '10000',
   RATE_LIMIT_AUTH_MAX: '10000',
   RATE_LIMIT_REFRESH_MAX: '10000',
+  // Fake values: Google's token endpoint is mocked in tests.
+  GOOGLE_CLIENT_ID: 'test-client-id.apps.googleusercontent.com',
+  GOOGLE_CLIENT_SECRET: 'test-only-google-client-secret',
 });

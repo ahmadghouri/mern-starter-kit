@@ -58,7 +58,8 @@ async function register({ name, email, password }, context) {
 
 async function login({ email, password }, context) {
   const user = await User.findOne({ email }).select('+passwordHash');
-  const hashToCompare = user ? user.passwordHash : await getDummyHash();
+  // Google-only accounts have no password; compare against the dummy hash so they fail the same way.
+  const hashToCompare = user?.passwordHash ?? (await getDummyHash());
   const passwordMatches = await bcrypt.compare(password, hashToCompare);
 
   if (!user || !passwordMatches) {
@@ -169,6 +170,7 @@ async function resetPassword({ token, password }) {
 }
 
 module.exports = {
+  issueAuthResult,
   register,
   login,
   refresh,

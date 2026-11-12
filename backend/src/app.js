@@ -11,6 +11,7 @@ const { createRateLimiters } = require('./middleware/rateLimiters');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const { createAdminRouter } = require('./routes/admin.routes');
 const { createAuthRouter } = require('./routes/auth.routes');
+const { createGoogleRouter } = require('./routes/google.routes');
 const { createProfileRouter, createAvatarRouter } = require('./routes/profile.routes');
 const { healthRouter } = require('./routes/health.routes');
 
@@ -35,7 +36,7 @@ function requestLogMessage(req, res) {
  * Builds the Express app without connecting to the database or listening,
  * so tests can use it with Supertest.
  */
-function createApp({ rateLimit = config.rateLimit } = {}) {
+function createApp({ rateLimit = config.rateLimit, google = config.google } = {}) {
   const app = express();
   const limiters = createRateLimiters(rateLimit);
 
@@ -76,7 +77,8 @@ function createApp({ rateLimit = config.rateLimit } = {}) {
 
   app.use('/api/health', healthRouter);
   app.use('/api', limiters.api);
-  app.use('/api/auth', createAuthRouter({ limiters, isTrustedOrigin }));
+  app.use('/api/auth/google', createGoogleRouter({ limiters, google }));
+  app.use('/api/auth', createAuthRouter({ limiters, isTrustedOrigin, google }));
   app.use('/api/admin', createAdminRouter());
   app.use('/api/profile', createProfileRouter({ limiters }));
   app.use('/api/avatars', createAvatarRouter());

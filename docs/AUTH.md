@@ -33,6 +33,46 @@ All responses use `{ "data": ... }` on success and
 Login, register, forgot, and reset are rate limited (`RATE_LIMIT_AUTH_MAX`
 per 15 minutes per IP).
 
+## Google sign-in (optional)
+
+Enabled only when both `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set
+in `backend/.env`. The web app asks `GET /api/auth/providers`
+(`{ providers: { google: true | false } }`) and shows "Continue with Google"
+only when it is enabled. With Google off, every `/api/auth/google/*` route
+returns 404.
+
+Flow (OAuth 2.0 authorization code flow with PKCE, all server side):
+
+1. The browser navigates to `GET /api/auth/google`. The API stores a random
+   `state` (SHA-256 hash only) and a PKCE verifier in the `oauthstates`
+   collection for 10 minutes, sets the raw state in an httpOnly
+   `oauth_state` cookie (`SameSite=Lax`, path `/api/auth/google`), and
+   redirects to Google.
+2. Google redirects to `GET /api/auth/google/callback?code&state`. The state
+   must match the cookie and an unused, unexpired record (single use).
+3. The API exchanges the code (with the client secret and PKCE verifier) at
+   Google's token endpoint and checks the ID token's `iss`, `aud`, `exp`,
+   `sub`, and `email_verified`. The token comes straight from Google over
+   TLS, so no extra signature check is needed (OpenID Connect Core 3.1.3.7).
+4. It signs the user in (same session and refresh cookie as a password
+   login) and redirects to `APP_URL`. Failures redirect to
+   `/login?error=google_*` with a code the web app turns into a message.
+
+Accounts:
+
+- A Google account is matched by its id (`googleId`), never by email alone.
+- New Google users get an account without a password. They can set one with
+  "Forgot password". Until then, password login, email change, and password
+  change return 400 `NO_PASSWORD_SET` or fail like a wrong password.
+- If a password account already uses the Google email, sign-in is refused
+  (`google_account_exists`). This blocks "pre-account takeover": someone who
+  registered that email earlier could otherwise share the account. The owner
+  signs in with the password and uses **Profile → Connected accounts →
+  Connect Google** (`GET /api/auth/google?intent=link`, identified by the
+  refresh cookie).
+- `DELETE /api/profile/google` disconnects Google. It requires a password so
+  users cannot lock themselves out.
+
 ## Profile endpoints
 
 All `/api/profile/*` routes require a bearer token and act on the signed-in

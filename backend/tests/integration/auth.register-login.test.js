@@ -17,6 +17,7 @@ describe('POST /api/auth/register', () => {
       name: VALID_USER.name,
       email: VALID_USER.email,
       role: 'user',
+      googleLinked: false,
       avatarVersion: null,
       createdAt: expect.any(String),
     });

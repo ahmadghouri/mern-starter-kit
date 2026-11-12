@@ -7,6 +7,7 @@ import { FormField } from '@/components/form/FormField';
 import { PasswordInput } from '@/components/form/PasswordInput';
 import { SubmitButton } from '@/components/form/SubmitButton';
 import { AuthLayout } from '@/components/layout/AuthLayout';
+import { GoogleSignIn } from '@/features/auth/GoogleSignIn';
 import { useAuth } from '@/features/auth/auth-context';
 import { useFormState } from '@/hooks/use-form-state';
 import {
@@ -70,6 +71,7 @@ export function RegisterPage() {
         </>
       }
     >
+      <GoogleSignIn />
       <form className="grid gap-4" onSubmit={handleSubmit} noValidate>
         <FormAlert message={formError} />
 

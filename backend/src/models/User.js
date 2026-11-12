@@ -13,7 +13,10 @@ const userSchema = new Schema(
       trim: true,
       maxlength: 254,
     },
-    passwordHash: { type: String, required: true, select: false },
+    // Missing for accounts created with Google sign-in until they set a password.
+    passwordHash: { type: String, select: false },
+    // Google account id (the `sub` claim). Unique when present.
+    googleId: { type: String, unique: true, sparse: true },
     role: { type: String, enum: USER_ROLES, default: 'user' },
     passwordChangedAt: { type: Date },
     // Set when a profile picture exists. Also used as a cache-busting version.
@@ -29,6 +32,7 @@ function toPublicUser(user) {
     name: user.name,
     email: user.email,
     role: user.role,
+    googleLinked: Boolean(user.googleId),
     avatarVersion: user.avatarUpdatedAt ? new Date(user.avatarUpdatedAt).getTime() : null,
     createdAt: user.createdAt,
   };

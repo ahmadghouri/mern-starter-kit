@@ -13,6 +13,12 @@ const commaSeparatedList = z
       .filter(Boolean),
   );
 
+// Empty values (e.g. `GOOGLE_CLIENT_ID=` copied from .env.example) count as unset.
+const optionalText = z.preprocess(
+  (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+  z.string().trim().optional(),
+);
+
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -53,6 +59,15 @@ const envSchema = z
     SMTP_SECURE: booleanString.default(false),
     SMTP_USER: z.string().optional(),
     SMTP_PASS: z.string().optional(),
+
+    // Google sign-in is enabled only when both values are set.
+    GOOGLE_CLIENT_ID: optionalText,
+    GOOGLE_CLIENT_SECRET: optionalText,
+    // Defaults to APP_URL + /api/auth/google/callback.
+    GOOGLE_REDIRECT_URI: z.preprocess(
+      (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+      z.url().optional(),
+    ),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV !== 'production') {
@@ -81,6 +96,14 @@ const envSchema = z
         code: 'custom',
         path: ['SMTP_HOST'],
         message: 'SMTP_HOST is required when EMAIL_TRANSPORT is "smtp"',
+      });
+    }
+
+    if (Boolean(env.GOOGLE_CLIENT_ID) !== Boolean(env.GOOGLE_CLIENT_SECRET)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: [env.GOOGLE_CLIENT_ID ? 'GOOGLE_CLIENT_SECRET' : 'GOOGLE_CLIENT_ID'],
+        message: 'Set both GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET, or neither',
       });
     }
   });
@@ -144,6 +167,13 @@ function loadConfig(source = process.env) {
         user: env.SMTP_USER,
         pass: env.SMTP_PASS,
       },
+    },
+    google: {
+      enabled: Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
+      clientId: env.GOOGLE_CLIENT_ID ?? null,
+      clientSecret: env.GOOGLE_CLIENT_SECRET ?? null,
+      redirectUri:
+        env.GOOGLE_REDIRECT_URI ?? new URL('/api/auth/google/callback', env.APP_URL).toString(),
     },
   });
 }

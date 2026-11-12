@@ -69,6 +69,21 @@ pnpm seed
 These defaults work only outside production. Override them with the
 `SEED_*` variables in `backend/.env`.
 
+### Google sign-in (optional)
+
+The "Continue with Google" button appears only when Google is configured in
+`backend/.env`:
+
+1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials),
+   create an **OAuth client ID** of type **Web application**.
+2. Add the authorized redirect URI
+   `http://localhost:5173/api/auth/google/callback` (in production:
+   `https://<your-app>/api/auth/google/callback`).
+3. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `backend/.env` and
+   restart the backend.
+
+Leave both empty to turn Google sign-in off. Details: [docs/AUTH.md](docs/AUTH.md#google-sign-in-optional).
+
 ### Logs
 
 The backend terminal prints one line per API call:
