@@ -28,6 +28,7 @@ function createProfileRouter({ limiters }) {
     validate({ body: changePasswordBody }),
     controller.changePassword,
   );
+  router.delete('/google', controller.disconnectGoogle);
   router.put(
     '/avatar',
     express.raw({ type: AVATAR_CONTENT_TYPES, limit: AVATAR_MAX_BYTES }),

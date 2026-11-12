@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { LogIn } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { FormAlert } from '@/components/form/FormAlert';
@@ -8,6 +8,8 @@ import { PasswordInput } from '@/components/form/PasswordInput';
 import { SubmitButton } from '@/components/form/SubmitButton';
 import { AuthLayout } from '@/components/layout/AuthLayout';
 import { useAuth } from '@/features/auth/auth-context';
+import { GoogleSignIn } from '@/features/auth/GoogleSignIn';
+import { getGoogleErrorMessage } from '@/features/auth/google';
 import { useFormState } from '@/hooks/use-form-state';
 import { collectErrors, fieldErrorsFromApi, validateEmail } from '@/lib/validation';
 
@@ -15,11 +17,14 @@ export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { values, errors, setErrors, handleChange } = useFormState({ email: '', password: '' });
   const [formError, setFormError] = useState(null);
   const [pending, setPending] = useState(false);
 
   const notice = location.state?.notice;
+  // Set when the Google sign-in flow redirects back with an error.
+  const googleError = getGoogleErrorMessage(searchParams.get('error'));
   const redirectTo = location.state?.from?.pathname ?? '/';
 
   async function handleSubmit(event) {
@@ -59,6 +64,8 @@ export function LoginPage() {
         </>
       }
     >
+      <FormAlert message={googleError} />
+      <GoogleSignIn />
       <form className="grid gap-4" onSubmit={handleSubmit} noValidate>
         <FormAlert variant="success" message={notice} />
         <FormAlert message={formError} />

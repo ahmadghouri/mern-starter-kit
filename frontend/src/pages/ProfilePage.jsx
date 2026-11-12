@@ -1,5 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/features/auth/auth-context';
+import { useAuthProviders } from '@/features/auth/google';
 import { AppearanceSection } from '@/features/profile/AppearanceSection';
+import { ConnectedAccounts } from '@/features/profile/ConnectedAccounts';
 import { AvatarSection } from '@/features/profile/AvatarSection';
 import { EmailForm, PasswordForm, PersonalInfoForm } from '@/features/profile/ProfileForms';
 
@@ -18,6 +21,9 @@ function Section({ title, description, children }) {
 }
 
 export function ProfilePage() {
+  const { user } = useAuth();
+  const providers = useAuthProviders();
+
   return (
     <div className="grid gap-6">
       <div>
@@ -43,6 +49,12 @@ export function ProfilePage() {
       >
         <PasswordForm />
       </Section>
+
+      {(providers.google || user.googleLinked) && (
+        <Section title="Connected accounts" description="Sign-in methods linked to your account.">
+          <ConnectedAccounts googleEnabled={providers.google} />
+        </Section>
+      )}
 
       <Section title="Appearance" description="Choose a theme. Saved in this browser.">
         <AppearanceSection />

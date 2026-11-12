@@ -10,6 +10,8 @@ export const profileService = {
   changePassword: ({ currentPassword, newPassword }) =>
     apiRequest('/profile/password', { method: 'PUT', body: { currentPassword, newPassword } }),
 
+  disconnectGoogle: () => apiRequest('/profile/google', { method: 'DELETE' }),
+
   /** `image` is a Blob (already resized), sent as raw bytes. */
   uploadAvatar: (image) => apiRequest('/profile/avatar', { method: 'PUT', body: image }),
 

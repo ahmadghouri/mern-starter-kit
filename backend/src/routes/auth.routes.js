@@ -11,9 +11,14 @@ const {
   sessionIdParams,
 } = require('../validators/auth.validators');
 
-function createAuthRouter({ limiters, isTrustedOrigin }) {
+function createAuthRouter({ limiters, isTrustedOrigin, google = { enabled: false } }) {
   const router = Router();
   const trustedOrigin = requireTrustedOrigin(isTrustedOrigin);
+
+  // Tells the web app which sign-in options to show (driven by backend .env).
+  router.get('/providers', (req, res) => {
+    res.json({ data: { providers: { google: google.enabled } } });
+  });
 
   router.post('/register', limiters.auth, validate({ body: registerBody }), controller.register);
   router.post('/login', limiters.auth, validate({ body: loginBody }), controller.login);

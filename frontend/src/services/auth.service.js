@@ -15,6 +15,9 @@ export const authService = {
 
   getCurrentUser: () => apiRequest('/auth/me'),
 
+  /** Which sign-in options the backend has enabled, e.g. `{ providers: { google: true } }`. */
+  getProviders: () => apiRequest('/auth/providers', { auth: false }),
+
   forgotPassword: (email) =>
     apiRequest('/auth/forgot-password', { method: 'POST', body: { email }, auth: false }),
 

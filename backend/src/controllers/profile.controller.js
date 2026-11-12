@@ -17,6 +17,11 @@ async function changePassword(req, res) {
   });
 }
 
+async function disconnectGoogle(req, res) {
+  const user = await profileService.disconnectGoogle(req.auth.userId);
+  res.json({ data: { user } });
+}
+
 async function uploadAvatar(req, res) {
   // express.raw() leaves req.body unset for other content types.
   const data = Buffer.isBuffer(req.body) ? req.body : null;
@@ -49,6 +54,7 @@ module.exports = {
   updateProfile,
   changeEmail,
   changePassword,
+  disconnectGoogle,
   uploadAvatar,
   removeAvatar,
   getAvatar,

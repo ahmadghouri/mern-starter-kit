@@ -17,7 +17,7 @@ describe('LoginPage', () => {
     expect(screen.getByText('Email is required')).toBeInTheDocument();
     expect(screen.getByText('Password is required')).toBeInTheDocument();
     expect(screen.getByLabelText('Email')).toHaveAttribute('aria-invalid', 'true');
-    expect(fetchMock).toHaveBeenCalledTimes(1); // only the initial refresh
+    expect(fetchMock).not.toHaveBeenCalledWith('/api/auth/login', expect.anything());
   });
 
   it('signs in and opens the dashboard', async () => {
