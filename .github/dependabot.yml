@@ -1,0 +1,14 @@
+version: 2
+updates:
+  # "npm" is Dependabot's ecosystem name; it reads pnpm-lock.yaml for pnpm workspaces.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      dev-dependencies:
+        dependency-type: development
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

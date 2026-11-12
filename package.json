@@ -1,0 +1,24 @@
+﻿{
+  "name": "mern-starter-kit",
+  "version": "1.0.0",
+  "private": true,
+  "author": "Muhammad Ahmad",
+  "license": "MIT",
+  "description": "MERN starter kit with secure session-based authentication.",
+  "packageManager": "pnpm@12.14.0",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --recursive run \"/^dev(:db)?$/\"",
+    "dev:backend": "pnpm --filter backend dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "seed": "pnpm --filter backend seed",
+    "lint": "pnpm --filter backend --filter frontend run lint",
+    "test": "pnpm --filter backend --filter frontend run test",
+    "test:e2e": "pnpm --filter e2e test",
+    "build": "pnpm --filter frontend build",
+    "rules:sync": "powershell -ExecutionPolicy Bypass -File ./scripts/sync-agent-rules.ps1"
+  }
+}

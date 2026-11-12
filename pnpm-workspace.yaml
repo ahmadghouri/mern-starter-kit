@@ -1,0 +1,10 @@
+packages:
+  - backend
+  - frontend
+  - e2e
+allowBuilds:
+  '@parcel/watcher': false
+  esbuild: false
+  mongodb-memory-server: false
+minimumReleaseAgeExclude:
+  - '@testing-library/user-event@14.6.10'

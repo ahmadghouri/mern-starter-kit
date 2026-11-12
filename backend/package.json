@@ -1,0 +1,46 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "private": true,
+  "author": "Muhammad Ahmad",
+  "license": "MIT",
+  "description": "Express + MongoDB API with session-based refresh token authentication.",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "nodemon",
+    "dev:db": "node scripts/dev-db.js",
+    "start": "node --env-file-if-exists=.env src/server.js",
+    "start:e2e": "node scripts/start-e2e.js",
+    "lint": "eslint .",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "seed": "node --env-file-if-exists=.env scripts/seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
+    "express-rate-limit": "^7.5.1",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.24.8",
+    "nodemailer": "^10.5.0",
+    "pino": "^9.14.0",
+    "pino-http": "^10.5.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "globals": "^17.14.0",
+    "jest": "^30.5.2",
+    "mongodb-memory-server": "^10.4.3",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.3.2"
+  }
+}
